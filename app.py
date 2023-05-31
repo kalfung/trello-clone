@@ -2,7 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 
-app = Flask(__name__)
+app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
 
 # database connection string below:
@@ -49,4 +49,4 @@ def index():
     return 'Lali ho, friend!'
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(debug=True) #this line runs the instance of Flask
