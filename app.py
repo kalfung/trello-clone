@@ -6,7 +6,7 @@ app = Flask(__name__)
 # print(app.config)
 
 # database connection string below:
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://kal:kalelfung@localhost:5432/trello_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
 # change the credentials to the dev one after remaking the user
 
 db = SQLAlchemy(app)
