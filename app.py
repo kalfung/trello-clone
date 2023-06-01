@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
@@ -12,6 +13,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameg
 db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 # print(db.__dict__) #can comment out this line
 
+ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
+
 class Card(db.Model): # inheriting from db.Model to create table
     __tablename__ = 'cards' #plural table name is standard relational database convention
 
@@ -20,6 +23,10 @@ class Card(db.Model): # inheriting from db.Model to create table
     description = db.Column(db.Text()) #text will have no limit on length
     status = db.Column(db.String(30))
     date_created = db.Column(db.Date())
+
+class CardSchema(ma.Schema): #not the same as a database schema, this is a Marshmallow schema
+    class Meta:
+        fields = ('id', 'title', 'description', 'status', 'date_created')
 
 @app.cli.command('create')
 def create_db():
@@ -78,10 +85,11 @@ def seed_db():
     db.session.commit()
     print('Models seeded')
 
+@app.route('/cards/')
 @app.route('/cards')
 # @app.cli.command('all_cards')
 def all_cards():
-    stmt = db.select(Card) # select * from cards;
+    stmt = db.select(Card).order_by(Card.status.desc()) # select * from cards;
     print(stmt)
     # cards = db.session.execute(stmt)
     # print(cards.all()) #this prints a list of tuples
@@ -89,17 +97,21 @@ def all_cards():
     print(cards)
     for flub in cards:
         print(flub.title)
-    return json.dumps(cards)
+    # return json.dumps(cards) #this line doesn't work
+    return CardSchema(many=True).dump(cards)
 
+    #just first card
     first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
     print(first_card)
 
+    # just first 2 cards
     tworecords = db.select(Card).limit(2) #just two cards
     printtwo = db.session.scalars(tworecords).all()
     print(printtwo)
     for floob in printtwo:
         print(floob.title)
 
+    # cards that are not Done or ID >2
     stmt = db.select(Card).where(Card.status != 'Done')
     stmt = db. select(Card).where(db.or_(Card.status != 'Done', Card.id >2)).order_by(Card.title.desc())
     inprogresscards = db.session.scalars(stmt).all()
