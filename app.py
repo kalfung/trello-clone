@@ -9,11 +9,11 @@ app = Flask(__name__) #creating an instance of a Flask application
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
 # change the credentials to the dev one after remaking the user
 
-db = SQLAlchemy(app)
+db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 # print(db.__dict__) #can comment out this line
 
-class Card(db.Model): # inheriting from db.Model
-    __tablename__ = 'cards'
+class Card(db.Model): # inheriting from db.Model to create table
+    __tablename__ = 'cards' #plural table name is standard relational database convention
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100)) #specifying a length limit
@@ -22,11 +22,11 @@ class Card(db.Model): # inheriting from db.Model
 
 @app.cli.command('create')
 def create_db():
-    db.drop_all()
-    db.create_all()
+    db.drop_all() #drops all the tables, and ...
+    db.create_all() #re-creates the tables from scratch
     print('Tables created successfully')
 
-@app.cli.command('seed') #seeding data
+@app.cli.command('seed') #command for seeding data
 def seed_db():
     # create an instance of the Card model in memory
     card = Card(
@@ -35,7 +35,7 @@ def seed_db():
         date_created = date.today()
     )
 
-    #Truncate the Card table
+    #Truncate the Card table - keeps the schema, but clears out all the rows
     db.session.query(Card).delete()
 
     # Add the card to the session (i.e. transaction)
