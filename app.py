@@ -78,7 +78,8 @@ def seed_db():
     db.session.commit()
     print('Models seeded')
 
-@app.cli.command('all_cards')
+@app.route('/cards')
+# @app.cli.command('all_cards')
 def all_cards():
     stmt = db.select(Card) # select * from cards;
     print(stmt)
@@ -88,14 +89,23 @@ def all_cards():
     print(cards)
     for flub in cards:
         print(flub.title)
+    return json.dumps(cards)
+
     first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
     print(first_card)
 
-    tworecords = db.select(Card).limit(2)
+    tworecords = db.select(Card).limit(2) #just two cards
     printtwo = db.session.scalars(tworecords).all()
     print(printtwo)
     for floob in printtwo:
         print(floob.title)
+
+    stmt = db.select(Card).where(Card.status != 'Done')
+    stmt = db. select(Card).where(db.or_(Card.status != 'Done', Card.id >2)).order_by(Card.title.desc())
+    inprogresscards = db.session.scalars(stmt).all()
+    for card in inprogresscards:
+        print(card.__dict__)
+
 
 @app.route('/')
 def index():
