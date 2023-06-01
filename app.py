@@ -18,6 +18,7 @@ class Card(db.Model): # inheriting from db.Model to create table
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100)) #specifying a length limit
     description = db.Column(db.Text()) #text will have no limit on length
+    status = db.Column(db.String(30))
     date_created = db.Column(db.Date())
 
 @app.cli.command('create')
@@ -48,16 +49,19 @@ def seed_db():
         Card(
         title = 'Start the project',
         description = 'Stage 1 - Create an ERD',
+        status='Done', 
         date_created = date.today()
         ),
         Card(
         title = 'ORM Queries',
         description = 'Stage 2 - Implement several queries',
+        status='In Progress',
         date_created = date.today()
         ),
         Card(
         title = 'Marshmallow',
         description = 'Stage 3 - Implement JSONify of models',
+        status='In Progress',
         date_created = date.today()
         )
     ]
