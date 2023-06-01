@@ -29,21 +29,69 @@ def create_db():
 @app.cli.command('seed') #command for seeding data
 def seed_db():
     # create an instance of the Card model in memory
-    card = Card(
+    # card1 = Card(
+    #     title = 'Start the project',
+    #     description = 'Stage 1 - Create an ERD',
+    #     date_created = date.today()
+    # )
+    # card2 = Card(
+    #     title = 'ORM Queries',
+    #     description = 'Stage 2 - Implement several queries',
+    #     date_created = date.today()
+    # )
+    # card3 = Card(
+    #     title = 'Marshmallow',
+    #     description = 'Stage 3 - Implement JSONify of models',
+    #     date_created = date.today()
+    # )
+    cards = [
+        Card(
         title = 'Start the project',
         description = 'Stage 1 - Create an ERD',
         date_created = date.today()
-    )
-
+        ),
+        Card(
+        title = 'ORM Queries',
+        description = 'Stage 2 - Implement several queries',
+        date_created = date.today()
+        ),
+        Card(
+        title = 'Marshmallow',
+        description = 'Stage 3 - Implement JSONify of models',
+        date_created = date.today()
+        )
+    ]
     #Truncate the Card table - keeps the schema, but clears out all the rows
     db.session.query(Card).delete()
 
     # Add the card to the session (i.e. transaction)
-    db.session.add(card)
+    # db.session.add(card1)
+    # db.session.add(card2)
+    # db.session.add(card3)
+    db.session.add_all(cards)
 
     # Commit the transaction to the database
     db.session.commit()
     print('Models seeded')
+
+@app.cli.command('all_cards')
+def all_cards():
+    stmt = db.select(Card) # select * from cards;
+    print(stmt)
+    # cards = db.session.execute(stmt)
+    # print(cards.all()) #this prints a list of tuples
+    cards = db.session.scalars(stmt).all() #scalars enables us to print out a list as opposed to a tuple of the cards
+    print(cards)
+    for flub in cards:
+        print(flub.title)
+    first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
+    print(first_card)
+
+    tworecords = db.select(Card).limit(2)
+    printtwo = db.session.scalars(tworecords).all()
+    print(printtwo)
+    for floob in printtwo:
+        print(floob.title)
 
 @app.route('/')
 def index():
