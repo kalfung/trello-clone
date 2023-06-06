@@ -131,9 +131,15 @@ def register():
         password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
         name=user_info['name']
     )
-    print(user)
-    # print(request.json)
-    return{}
+
+    db.session.add(user)
+    db.session.commit()
+    
+    return UserSchema(exclude=['password']).dump(user), 201
+
+    # print(user)
+    # # print(request.json)
+    # return{}
 
 @app.route('/cards/')
 @app.route('/cards')
