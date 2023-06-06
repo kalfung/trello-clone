@@ -15,6 +15,22 @@ db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 
 ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
 
+# creating a model for the users entity
+class User(db.Model):
+    __tablename__ = 'users' # plural due to standard relational database naming convention for tables
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    email = db.Column(db.String, nullable=False, unique=True) #every value in this column MUST be unique
+    password = db.Column(db.String, nullable=False) #every user MUST have a password
+    is_admin = db.Column(db.Boolean, default=False) # a new user by default will not be an admin
+
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('name', 'email', 'is_admin') # password has not been included here
+
+
+
 class Card(db.Model): # inheriting from db.Model to create table
     __tablename__ = 'cards' #plural table name is standard relational database convention
 
@@ -82,6 +98,7 @@ def seed_db():
     db.session.add_all(cards)
 
     # Commit the transaction to the database
+    # until we commit, any queries that we add will simply be queued up until we commit
     db.session.commit()
     print('Models seeded')
 
@@ -98,7 +115,7 @@ def all_cards():
     for flub in cards:
         print(flub.title)
     # return json.dumps(cards) #this line doesn't work
-    return CardSchema(many=True).dump(cards)
+    return CardSchema(many=True).dump(cards) #returning the Marshmallow schema
 
     #just first card
     first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
