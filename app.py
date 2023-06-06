@@ -7,6 +7,8 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
 
+app.config['JSON_SORT_KEYS'] = False
+
 # database connection string below:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
 # change the credentials to the dev one after remaking the user
@@ -30,7 +32,7 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ('name', 'email', 'is_admin') # password has not been included here
+        fields = ('name', 'email','password', 'is_admin') # password has not been included here
 
 class Card(db.Model): # inheriting from db.Model to create table
     __tablename__ = 'cards' #plural table name is standard relational database convention
@@ -44,6 +46,7 @@ class Card(db.Model): # inheriting from db.Model to create table
 class CardSchema(ma.Schema): #not the same as a database schema, this is a Marshmallow schema
     class Meta:
         fields = ('id', 'title', 'description', 'status', 'date_created')
+        ordered = True
 
 @app.cli.command('create')
 def create_db():
@@ -124,9 +127,9 @@ def seed_db():
 def register():
     user_info = UserSchema().load(request.json)
     user = User(
-        email=user_info.email, #using .email instead of square brackets
-        password=bcrypt.generate_password_hash(user_info.password).decode('utf-8'),
-        name=user_info.name
+        email=user_info['email'], 
+        password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
+        name=user_info['name']
     )
     print(user)
     # print(request.json)
