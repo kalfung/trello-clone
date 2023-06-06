@@ -47,7 +47,6 @@ class Card(db.Model): # inheriting from db.Model to create table
 class CardSchema(ma.Schema): #not the same as a database schema, this is a Marshmallow schema
     class Meta:
         fields = ('id', 'title', 'description', 'status', 'date_created')
-        ordered = True
 
 @app.cli.command('create')
 def create_db():
