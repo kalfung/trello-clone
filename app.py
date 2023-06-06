@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
@@ -119,6 +119,19 @@ def seed_db():
     db.session.commit()
     print('Models seeded')
 
+@app.route('/register', methods=['POST'])
+@app.route('/register/', methods=['POST'])
+def register():
+    user_info = UserSchema().load(request.json)
+    user = User(
+        email=user_info.email, #using .email instead of square brackets
+        password=bcrypt.generate_password_hash(user_info.password).decode('utf-8'),
+        name=user_info.name
+    )
+    print(user)
+    # print(request.json)
+    return{}
+
 @app.route('/cards/')
 @app.route('/cards')
 # @app.cli.command('all_cards')
@@ -154,6 +167,10 @@ def all_cards():
 
 
 @app.route('/')
+@app.route('/home')
+@app.route('/home/')
+@app.route('/index')
+@app.route('/index/')
 def index():
     return 'Lali ho, friend!'
 
