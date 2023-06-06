@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
+from sqlalchemy.exc import IntegrityError
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
@@ -125,21 +126,25 @@ def seed_db():
 @app.route('/register', methods=['POST'])
 @app.route('/register/', methods=['POST'])
 def register():
-    user_info = UserSchema().load(request.json)
-    user = User(
-        email=user_info['email'], 
-        password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
-        name=user_info['name']
-    )
+    try:
+        #Parse, sanitise and validate the incoming JSON data via the schema
+        user_info = UserSchema().load(request.json)
+        # create a new user model instance with the schema data
+        user = User(
+            email=user_info['email'], 
+            password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
+            name=user_info['name']
+        )
 
-    db.session.add(user)
-    db.session.commit()
-    
-    return UserSchema(exclude=['password']).dump(user), 201
-
-    # print(user)
-    # # print(request.json)
-    # return{}
+        db.session.add(user)
+        db.session.commit()
+        
+        return UserSchema(exclude=['password']).dump(user), 201
+    except IntegrityError:
+        return {'error': 'Email address already in use'}, 409
+        # print(user)
+        # # print(request.json)
+        # return{}
 
 @app.route('/cards/')
 @app.route('/cards')
