@@ -56,13 +56,13 @@ def seed_db():
     users = [
         User(
             email='admin@spam.com',
-            password=bcrypt.generate_password_hash('spinynorman'),
+            password=bcrypt.generate_password_hash('spinynorman').decode('utf-8'),
             is_admin=True
         ),
         User(
             name='John Cleese',
             email='cleese@spam.com',
-            password=bcrypt.generate_password_hash('tisbutascratch')
+            password=bcrypt.generate_password_hash('tisbutascratch').decode('utf-8')
         )
     ]
 
