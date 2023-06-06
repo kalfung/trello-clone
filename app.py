@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
@@ -14,6 +15,8 @@ db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 # print(db.__dict__) #can comment out this line
 
 ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
+#creating a bcrypt instance and passing it into the flask application
+bcrypt = Bcrypt(app)
 
 # creating a model for the users entity
 class User(db.Model):
@@ -28,8 +31,6 @@ class User(db.Model):
 class UserSchema(ma.Schema):
     class Meta:
         fields = ('name', 'email', 'is_admin') # password has not been included here
-
-
 
 class Card(db.Model): # inheriting from db.Model to create table
     __tablename__ = 'cards' #plural table name is standard relational database convention
@@ -55,13 +56,13 @@ def seed_db():
     users = [
         User(
             email='admin@spam.com',
-            password='spinynorman',
+            password=bcrypt.generate_password_hash('spinynorman'),
             is_admin=True
         ),
         User(
             name='John Cleese',
             email='cleese@spam.com',
-            password='tisbutascratch'
+            password=bcrypt.generate_password_hash('tisbutascratch')
         )
     ]
 
