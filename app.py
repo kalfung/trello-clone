@@ -52,6 +52,20 @@ def create_db():
 
 @app.cli.command('seed') #command for seeding data
 def seed_db():
+    users = [
+        User(
+            email='admin@spam.com',
+            password='spinynorman',
+            is_admin=True
+        ),
+        User(
+            name='John Cleese',
+            email='cleese@spam.com',
+            password='tisbutascratch'
+        )
+    ]
+
+
     # create an instance of the Card model in memory
     # card1 = Card(
     #     title = 'Start the project',
@@ -89,13 +103,15 @@ def seed_db():
         )
     ]
     #Truncate the Card table - keeps the schema, but clears out all the rows
-    db.session.query(Card).delete()
+    db.session.query(Card).delete() #truncate the cards table
+    db.session.query(User).delete() # truncate the users table
 
     # Add the card to the session (i.e. transaction)
     # db.session.add(card1)
     # db.session.add(card2)
     # db.session.add(card3)
     db.session.add_all(cards)
+    db.session.add_all(users)
 
     # Commit the transaction to the database
     # until we commit, any queries that we add will simply be queued up until we commit
