@@ -146,14 +146,17 @@ def register():
         # return{}
 
 @app.route('/login', methods=['POST'])
-# @app.route('/login/', methods=['POST'])
+@app.route('/login/', methods=['POST'])
 def login():
-    stmt = db.select(User).filter_by(email=request.json['email'])
-    user = db.session.scalar(stmt) #returns a single result, not in a list
-    if user and bcrypt.check_password_hash(user.password, request.json['password']):
-        return UserSchema(exclude=['password']).dump(user)
-    else:
-        return {'error': 'Invalid email address or password'}, 401
+    try:
+        stmt = db.select(User).filter_by(email=request.json['email'])
+        user = db.session.scalar(stmt) #returns a single result, not in a list
+        if user and bcrypt.check_password_hash(user.password, request.json['password']):
+            return UserSchema(exclude=['password']).dump(user)
+        else:
+            return {'error': 'Invalid email address or password'}, 401
+    except KeyError:
+        return {'error': 'Email address and password are required'}, 400
 
 @app.route('/cards/')
 @app.route('/cards')
