@@ -4,6 +4,7 @@ from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
