@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
 
-app.config['JSON_SORT_KEYS'] = False
+app.config['JSON_SORT_KEYS'] = False #this line doesn't seem to do anything anymore
 
 # database connection string below:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
@@ -144,6 +144,16 @@ def register():
         # print(user)
         # # print(request.json)
         # return{}
+
+@app.route('/login', methods=['POST'])
+# @app.route('/login/', methods=['POST'])
+def login():
+    stmt = db.select(User).filter_by(email=request.json['email'])
+    user = db.session.scalar(stmt) #returns a single result, not in a list
+    if user and bcrypt.check_password_hash(user.password, request.json['password']):
+        return UserSchema(exclude=['password']).dump(user)
+    else:
+        return {'error': 'Invalid email address or password'}, 401
 
 @app.route('/cards/')
 @app.route('/cards')
