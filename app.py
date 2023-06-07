@@ -11,6 +11,8 @@ app = Flask(__name__) #creating an instance of a Flask application
 
 app.config['JSON_SORT_KEYS'] = False #this line doesn't seem to do anything anymore
 
+app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
+
 # database connection string below:
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
 # change the credentials to the dev one after remaking the user
@@ -21,6 +23,8 @@ db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
 #creating a bcrypt instance and passing it into the flask application
 bcrypt = Bcrypt(app)
+
+jwt = JWTManager(app)
 
 # creating a model for the users entity
 class User(db.Model):
