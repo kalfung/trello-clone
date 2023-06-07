@@ -4,7 +4,7 @@ from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
@@ -157,7 +157,8 @@ def login():
         stmt = db.select(User).filter_by(email=request.json['email'])
         user = db.session.scalar(stmt) #returns a single result, not in a list
         if user and bcrypt.check_password_hash(user.password, request.json['password']):
-            return UserSchema(exclude=['password']).dump(user)
+            token = create_access_token(identity=user.email)
+            return {'token':token, 'user': UserSchema(exclude=['password']).dump(user)}
         else:
             return {'error': 'Invalid email address or password'}, 401
     except KeyError:
