@@ -4,7 +4,7 @@ from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 
 app = Flask(__name__) #creating an instance of a Flask application
@@ -170,6 +170,12 @@ def login():
 @jwt_required()
 # @app.cli.command('all_cards')
 def all_cards():
+    user_email = get_jwt_identity()
+    stmt = db.select(User).filter_by(email=user_email)
+    user = db.session.scalar(stmt)
+    if not user.is_admin:
+        return {'error': 'You must be an admin'}, 401
+    
     stmt = db.select(Card).order_by(Card.status.desc()) # select * from cards;
     print(stmt)
     # cards = db.session.execute(stmt)
@@ -179,7 +185,7 @@ def all_cards():
     for flub in cards:
         print(flub.title)
     # return json.dumps(cards) #this line doesn't work
-    return CardSchema(many=True).dump(cards) #returning the Marshmallow schema
+    return CardSchema(many=True, exclude=['date_created']).dump(cards) #returning the Marshmallow schema
 
     #just first card
     first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
