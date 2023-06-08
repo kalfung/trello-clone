@@ -48,6 +48,7 @@ def admin_required():
 def unathorized(err):
     return {'error': 'You must be an admin'}, 401
 
+#----- MOVING BELOW THIS LINE TO USER
 # creating a model for the users entity
 class User(db.Model):
     __tablename__ = 'users' # plural due to standard relational database naming convention for tables
@@ -61,6 +62,7 @@ class User(db.Model):
 class UserSchema(ma.Schema):
     class Meta:
         fields = ('name', 'email','password', 'is_admin') # password has not been included here
+#----- MOVING ABOVE THIS LINE TO USER
 
 class Card(db.Model): # inheriting from db.Model to create table
     __tablename__ = 'cards' #plural table name is standard relational database convention
