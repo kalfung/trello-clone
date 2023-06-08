@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from models.user import User, UserSchema
 from models.card import Card, CardSchema
 from init import db, ma, bcrypt, jwt
+from blueprints.cli_bp import db_commands
 
 load_dotenv()
 
@@ -87,80 +88,83 @@ def unathorized(err):
 #         fields = ('id', 'title', 'description', 'status', 'date_created')
 #----- MOVING ABOVE THIS LINE TO CARD
 
+#----- MOVING BELOW THIS LINE TO cli_bp.py
+# @app.cli.command('create')
+# def create_db():
+#     db.drop_all() #drops all the tables, and ...
+#     db.create_all() #re-creates the tables from scratch
+#     print('Tables created successfully')
 
-@app.cli.command('create')
-def create_db():
-    db.drop_all() #drops all the tables, and ...
-    db.create_all() #re-creates the tables from scratch
-    print('Tables created successfully')
-
-@app.cli.command('seed') #command for seeding data
-def seed_db():
-    users = [
-        User(
-            email='admin@spam.com',
-            password=bcrypt.generate_password_hash('spinynorman').decode('utf-8'),
-            is_admin=True
-        ),
-        User(
-            name='John Cleese',
-            email='cleese@spam.com',
-            password=bcrypt.generate_password_hash('tisbutascratch').decode('utf-8')
-        )
-    ]
+# @app.cli.command('seed') #command for seeding data
+# def seed_db():
+#     users = [
+#         User(
+#             email='admin@spam.com',
+#             password=bcrypt.generate_password_hash('spinynorman').decode('utf-8'),
+#             is_admin=True
+#         ),
+#         User(
+#             name='John Cleese',
+#             email='cleese@spam.com',
+#             password=bcrypt.generate_password_hash('tisbutascratch').decode('utf-8')
+#         )
+#     ]
 
 
-    # create an instance of the Card model in memory
-    # card1 = Card(
-    #     title = 'Start the project',
-    #     description = 'Stage 1 - Create an ERD',
-    #     date_created = date.today()
-    # )
-    # card2 = Card(
-    #     title = 'ORM Queries',
-    #     description = 'Stage 2 - Implement several queries',
-    #     date_created = date.today()
-    # )
-    # card3 = Card(
-    #     title = 'Marshmallow',
-    #     description = 'Stage 3 - Implement JSONify of models',
-    #     date_created = date.today()
-    # )
-    cards = [
-        Card(
-        title = 'Start the project',
-        description = 'Stage 1 - Create an ERD',
-        status='Done', 
-        date_created = date.today()
-        ),
-        Card(
-        title = 'ORM Queries',
-        description = 'Stage 2 - Implement several queries',
-        status='In Progress',
-        date_created = date.today()
-        ),
-        Card(
-        title = 'Marshmallow',
-        description = 'Stage 3 - Implement JSONify of models',
-        status='In Progress',
-        date_created = date.today()
-        )
-    ]
-    #Truncate the Card table - keeps the schema, but clears out all the rows
-    db.session.query(Card).delete() #truncate the cards table
-    db.session.query(User).delete() # truncate the users table
+#     # create an instance of the Card model in memory
+#     # card1 = Card(
+#     #     title = 'Start the project',
+#     #     description = 'Stage 1 - Create an ERD',
+#     #     date_created = date.today()
+#     # )
+#     # card2 = Card(
+#     #     title = 'ORM Queries',
+#     #     description = 'Stage 2 - Implement several queries',
+#     #     date_created = date.today()
+#     # )
+#     # card3 = Card(
+#     #     title = 'Marshmallow',
+#     #     description = 'Stage 3 - Implement JSONify of models',
+#     #     date_created = date.today()
+#     # )
+#     cards = [
+#         Card(
+#         title = 'Start the project',
+#         description = 'Stage 1 - Create an ERD',
+#         status='Done', 
+#         date_created = date.today()
+#         ),
+#         Card(
+#         title = 'ORM Queries',
+#         description = 'Stage 2 - Implement several queries',
+#         status='In Progress',
+#         date_created = date.today()
+#         ),
+#         Card(
+#         title = 'Marshmallow',
+#         description = 'Stage 3 - Implement JSONify of models',
+#         status='In Progress',
+#         date_created = date.today()
+#         )
+#     ]
+#     #Truncate the Card table - keeps the schema, but clears out all the rows
+#     db.session.query(Card).delete() #truncate the cards table
+#     db.session.query(User).delete() # truncate the users table
 
-    # Add the card to the session (i.e. transaction)
-    # db.session.add(card1)
-    # db.session.add(card2)
-    # db.session.add(card3)
-    db.session.add_all(cards)
-    db.session.add_all(users)
+#     # Add the card to the session (i.e. transaction)
+#     # db.session.add(card1)
+#     # db.session.add(card2)
+#     # db.session.add(card3)
+#     db.session.add_all(cards)
+#     db.session.add_all(users)
 
-    # Commit the transaction to the database
-    # until we commit, any queries that we add will simply be queued up until we commit
-    db.session.commit()
-    print('Models seeded')
+#     # Commit the transaction to the database
+#     # until we commit, any queries that we add will simply be queued up until we commit
+#     db.session.commit()
+#     print('Models seeded')
+# ------ MOVING ABOVE THIS LINE TO cli_bp.py
+
+app.register_blueprint(db_commands)
 
 @app.route('/register', methods=['POST'])
 @app.route('/register/', methods=['POST'])
