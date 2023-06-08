@@ -1,18 +1,19 @@
 from flask import Flask, request, abort
 # from flask_sqlalchemy import SQLAlchemy # moved to init.py
-from datetime import date
+# from datetime import date
 # from flask_marshmallow import Marshmallow # moved to init.py
 # from flask_bcrypt import Bcrypt  # moved to init.py
-from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from datetime import timedelta
+# from sqlalchemy.exc import IntegrityError
+# from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+# from datetime import timedelta
 from os import environ
 from dotenv import load_dotenv
-from models.user import User, UserSchema
-from models.card import Card, CardSchema
+# from models.user import User, UserSchema
+# from models.card import Card, CardSchema
 from init import db, ma, bcrypt, jwt
 from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
+from blueprints.cards_bp import cards_bp
 
 load_dotenv()
 
@@ -46,13 +47,15 @@ ma.init_app(app)
 bcrypt.init_app(app)
 jwt.init_app(app)
 
+# #---- MOVING BELOW THIS LINE TO auth_bp.py
+# def admin_required():
+#     user_email = get_jwt_identity()
+#     stmt = db.select(User).filter_by(email=user_email)
+#     user = db.session.scalar(stmt)
+#     if not (user and user.is_admin):
+#         abort(401)
+# #---- MOVING ABOVE THIS LINE TO auth_bp.py
 
-def admin_required():
-    user_email = get_jwt_identity()
-    stmt = db.select(User).filter_by(email=user_email)
-    user = db.session.scalar(stmt)
-    if not (user and user.is_admin):
-        abort(401)
 
 @app.errorhandler(401)
 def unathorized(err):
@@ -167,6 +170,7 @@ def unathorized(err):
 
 app.register_blueprint(cli_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(cards_bp)
 
 # # ------ MOVING BELOW THIS LINE TO auth_bp.py
 # @app.route('/register', methods=['POST'])
@@ -208,48 +212,49 @@ app.register_blueprint(auth_bp)
 #         return {'error': 'Email address and password are required'}, 400
 # # ------ MOVING ABOVE THIS LINE TO auth_bp.py
 
-@app.route('/cards/')
-@app.route('/cards')
-@jwt_required()
-# @app.cli.command('all_cards')
-def all_cards():
-    admin_required()
-    # this block has been moved up to the admin_required function
-    # user_email = get_jwt_identity()
-    # stmt = db.select(User).filter_by(email=user_email)
-    # user = db.session.scalar(stmt)
-    # if not user.is_admin:
-    #     return {'error': 'You must be an admin'}, 401
+#----- MOVING BELOW THIS LINE to cards_bp.py
+# @app.route('/cards/')
+# @app.route('/cards')
+# @jwt_required()
+# # @app.cli.command('all_cards')
+# def all_cards():
+#     admin_required()
+#     # this block has been moved up to the admin_required function
+#     # user_email = get_jwt_identity()
+#     # stmt = db.select(User).filter_by(email=user_email)
+#     # user = db.session.scalar(stmt)
+#     # if not user.is_admin:
+#     #     return {'error': 'You must be an admin'}, 401
     
-    stmt = db.select(Card).order_by(Card.status.desc()) # select * from cards;
-    print(stmt)
-    # cards = db.session.execute(stmt)
-    # print(cards.all()) #this prints a list of tuples
-    cards = db.session.scalars(stmt).all() #scalars enables us to print out a list as opposed to a tuple of the cards
-    print(cards)
-    for flub in cards:
-        print(flub.title)
-    # return json.dumps(cards) #this line doesn't work
-    return CardSchema(many=True, exclude=['date_created']).dump(cards) #returning the Marshmallow schema
+#     stmt = db.select(Card).order_by(Card.status.desc()) # select * from cards;
+#     print(stmt)
+#     # cards = db.session.execute(stmt)
+#     # print(cards.all()) #this prints a list of tuples
+#     cards = db.session.scalars(stmt).all() #scalars enables us to print out a list as opposed to a tuple of the cards
+#     print(cards)
+#     for flub in cards:
+#         print(flub.title)
+#     # return json.dumps(cards) #this line doesn't work
+#     return CardSchema(many=True, exclude=['date_created']).dump(cards) #returning the Marshmallow schema
 
-    #just first card
-    first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
-    print(first_card)
+#     #just first card
+#     first_card = db.session.scalars(stmt).first() #selecting and printing just the first card
+#     print(first_card)
 
-    # just first 2 cards
-    tworecords = db.select(Card).limit(2) #just two cards
-    printtwo = db.session.scalars(tworecords).all()
-    print(printtwo)
-    for floob in printtwo:
-        print(floob.title)
+#     # just first 2 cards
+#     tworecords = db.select(Card).limit(2) #just two cards
+#     printtwo = db.session.scalars(tworecords).all()
+#     print(printtwo)
+#     for floob in printtwo:
+#         print(floob.title)
 
-    # cards that are not Done or ID >2
-    stmt = db.select(Card).where(Card.status != 'Done')
-    stmt = db. select(Card).where(db.or_(Card.status != 'Done', Card.id >2)).order_by(Card.title.desc())
-    inprogresscards = db.session.scalars(stmt).all()
-    for card in inprogresscards:
-        print(card.__dict__)
-
+#     # cards that are not Done or ID >2
+#     stmt = db.select(Card).where(Card.status != 'Done')
+#     stmt = db. select(Card).where(db.or_(Card.status != 'Done', Card.id >2)).order_by(Card.title.desc())
+#     inprogresscards = db.session.scalars(stmt).all()
+#     for card in inprogresscards:
+#         print(card.__dict__)
+#----- MOVING ABOVE THIS LINE to cards_bp.py
 
 @app.route('/')
 @app.route('/home')
