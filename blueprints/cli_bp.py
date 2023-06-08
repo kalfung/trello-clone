@@ -6,15 +6,15 @@ from models.user import User
 from models.card import Card
 from init import db, bcrypt
 
-db_commands = Blueprint('db', __name__)
+cli_bp = Blueprint('db', __name__)
 
-@db_commands.cli.command('create')
+@cli_bp.cli.command('create')
 def create_db():
     db.drop_all() #drops all the tables, and ...
     db.create_all() #re-creates the tables from scratch
     print('Tables created successfully')
 
-@db_commands.cli.command('seed') #command for seeding data
+@cli_bp.cli.command('seed') #command for seeding data
 def seed_db():
     users = [
         User(

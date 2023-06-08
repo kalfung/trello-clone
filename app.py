@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from models.user import User, UserSchema
 from models.card import Card, CardSchema
 from init import db, ma, bcrypt, jwt
-from blueprints.cli_bp import db_commands
+from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
 
 load_dotenv()
@@ -165,7 +165,7 @@ def unathorized(err):
 #     print('Models seeded')
 # ------ MOVING ABOVE THIS LINE TO cli_bp.py
 
-app.register_blueprint(db_commands)
+app.register_blueprint(cli_bp)
 app.register_blueprint(auth_bp)
 
 # # ------ MOVING BELOW THIS LINE TO auth_bp.py
