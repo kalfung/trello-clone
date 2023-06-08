@@ -6,16 +6,23 @@ from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
+from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
 
 app.config['JSON_SORT_KEYS'] = False #this line doesn't seem to do anything anymore
 
-app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
+# app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
+app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 
 # database connection string below:
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
+
 # change the credentials to the dev one after remaking the user
 
 db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
