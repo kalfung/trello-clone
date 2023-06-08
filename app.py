@@ -1,14 +1,15 @@
 from flask import Flask, request, abort
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy # moved to init.py
 from datetime import date
-from flask_marshmallow import Marshmallow
-from flask_bcrypt import Bcrypt
+# from flask_marshmallow import Marshmallow # moved to init.py
+# from flask_bcrypt import Bcrypt  # moved to init.py
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 from os import environ
 from dotenv import load_dotenv
 from models.user import User, UserSchema
+from init import db, ma, bcrypt, jwt
 
 load_dotenv()
 
@@ -161,6 +162,7 @@ def register():
             name=user_info['name']
         )
 
+        #Add and commit the new user
         db.session.add(user)
         db.session.commit()
         
