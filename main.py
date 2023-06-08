@@ -17,7 +17,8 @@ from blueprints.cards_bp import cards_bp
 
 # load_dotenv()
 
-def create_app():
+#this is a factory function - it creates and configures an object, and then returns that object
+def setup():
     
     app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
