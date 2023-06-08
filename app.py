@@ -26,7 +26,7 @@ app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 # change the credentials to the dev one after remaking the user
 
-# -----THIS has been moved to init 
+# ----- BELOW THIS LINE has been moved to init 
 # db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
 # # print(db.__dict__) #can comment out this line
 
@@ -35,7 +35,14 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 # bcrypt = Bcrypt(app)
 
 # jwt = JWTManager(app)
-#------
+#------ ABOVE THIS LINE has been moved to init
+
+# solving the circular import problem
+db.init_app(app)
+ma.init_app(app)
+bcrypt.init_app(app)
+jwt.init_app(app)
+
 
 def admin_required():
     user_email = get_jwt_identity()
@@ -50,18 +57,18 @@ def unathorized(err):
 
 #----- MOVING BELOW THIS LINE TO USER
 # creating a model for the users entity
-class User(db.Model):
-    __tablename__ = 'users' # plural due to standard relational database naming convention for tables
+# class User(db.Model):
+#     __tablename__ = 'users' # plural due to standard relational database naming convention for tables
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    email = db.Column(db.String, nullable=False, unique=True) #every value in this column MUST be unique
-    password = db.Column(db.String, nullable=False) #every user MUST have a password
-    is_admin = db.Column(db.Boolean, default=False) # a new user by default will not be an admin
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String)
+#     email = db.Column(db.String, nullable=False, unique=True) #every value in this column MUST be unique
+#     password = db.Column(db.String, nullable=False) #every user MUST have a password
+#     is_admin = db.Column(db.Boolean, default=False) # a new user by default will not be an admin
 
-class UserSchema(ma.Schema):
-    class Meta:
-        fields = ('name', 'email','password', 'is_admin') # password has not been included here
+# class UserSchema(ma.Schema):
+#     class Meta:
+#         fields = ('name', 'email','password', 'is_admin') # password has not been included here
 #----- MOVING ABOVE THIS LINE TO USER
 
 class Card(db.Model): # inheriting from db.Model to create table
