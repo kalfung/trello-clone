@@ -8,6 +8,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from datetime import timedelta
 from os import environ
 from dotenv import load_dotenv
+from models.user import User, UserSchema
 
 load_dotenv()
 
@@ -22,17 +23,18 @@ app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 # database connection string below:
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
-
 # change the credentials to the dev one after remaking the user
 
-db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
-# print(db.__dict__) #can comment out this line
+# -----THIS has been moved to init 
+# db = SQLAlchemy(app) #passing the app object into the instance of SQLAlchemy
+# # print(db.__dict__) #can comment out this line
 
-ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
-#creating a bcrypt instance and passing it into the flask application
-bcrypt = Bcrypt(app)
+# ma = Marshmallow(app) # set up instance of Marshmallow and passing through the app object
+# #creating a bcrypt instance and passing it into the flask application
+# bcrypt = Bcrypt(app)
 
-jwt = JWTManager(app)
+# jwt = JWTManager(app)
+#------
 
 def admin_required():
     user_email = get_jwt_identity()
