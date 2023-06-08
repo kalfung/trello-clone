@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 from flask_marshmallow import Marshmallow
@@ -26,6 +26,17 @@ ma = Marshmallow(app) # set up instance of Marshmallow and passing through the a
 bcrypt = Bcrypt(app)
 
 jwt = JWTManager(app)
+
+def admin_required():
+    user_email = get_jwt_identity()
+    stmt = db.select(User).filter_by(email=user_email)
+    user = db.session.scalar(stmt)
+    if not (user and user.is_admin):
+        abort(401)
+
+@app.errorhandler(401)
+def unathorized(err):
+    return {'error': 'You must be an admin'}, 401
 
 # creating a model for the users entity
 class User(db.Model):
@@ -170,11 +181,13 @@ def login():
 @jwt_required()
 # @app.cli.command('all_cards')
 def all_cards():
-    user_email = get_jwt_identity()
-    stmt = db.select(User).filter_by(email=user_email)
-    user = db.session.scalar(stmt)
-    if not user.is_admin:
-        return {'error': 'You must be an admin'}, 401
+    admin_required()
+    # this block has been moved up to the admin_required function
+    # user_email = get_jwt_identity()
+    # stmt = db.select(User).filter_by(email=user_email)
+    # user = db.session.scalar(stmt)
+    # if not user.is_admin:
+    #     return {'error': 'You must be an admin'}, 401
     
     stmt = db.select(Card).order_by(Card.status.desc()) # select * from cards;
     print(stmt)
