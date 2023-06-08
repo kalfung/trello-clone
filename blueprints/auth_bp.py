@@ -5,8 +5,6 @@ from sqlalchemy.exc import IntegrityError
 from init import db, bcrypt
 from flask_jwt_extended import create_access_token, get_jwt_identity
 
-
-
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
@@ -46,6 +44,7 @@ def login():
             return {'error': 'Invalid email address or password'}, 401
     except KeyError:
         return {'error': 'Email address and password are required'}, 400
+
 
 def admin_required():
     user_email = get_jwt_identity()

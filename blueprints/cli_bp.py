@@ -6,7 +6,7 @@ from models.user import User
 from models.card import Card
 from init import db, bcrypt
 
-cli_bp = Blueprint('db', __name__)
+cli_bp = Blueprint('db', __name__) #this is simply a container
 
 @cli_bp.cli.command('create')
 def create_db():

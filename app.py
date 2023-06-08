@@ -7,7 +7,7 @@ from flask import Flask, request, abort
 # from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 # from datetime import timedelta
 from os import environ
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 # from models.user import User, UserSchema
 # from models.card import Card, CardSchema
 from init import db, ma, bcrypt, jwt
@@ -15,19 +15,21 @@ from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
 from blueprints.cards_bp import cards_bp
 
-load_dotenv()
+# load_dotenv()
 
-app = Flask(__name__) #creating an instance of a Flask application
+def create_app():
+    
+    app = Flask(__name__) #creating an instance of a Flask application
 # print(app.config)
 
-app.config['JSON_SORT_KEYS'] = False #this line doesn't seem to do anything anymore
+    app.config['JSON_SORT_KEYS'] = False #this line doesn't seem to do anything anymore
 
 # app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
-app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
+    app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 
 # database connection string below:
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@localhost:5432/trello_db'
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
+    app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 # change the credentials to the dev one after remaking the user
 
 # ----- BELOW THIS LINE has been moved to init 
@@ -42,10 +44,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URI')
 #------ ABOVE THIS LINE has been moved to init
 
 # solving the circular import problem
-db.init_app(app)
-ma.init_app(app)
-bcrypt.init_app(app)
-jwt.init_app(app)
+    db.init_app(app)
+    ma.init_app(app)
+    bcrypt.init_app(app)
+    jwt.init_app(app)
 
 # #---- MOVING BELOW THIS LINE TO auth_bp.py
 # def admin_required():
@@ -57,9 +59,9 @@ jwt.init_app(app)
 # #---- MOVING ABOVE THIS LINE TO auth_bp.py
 
 
-@app.errorhandler(401)
-def unathorized(err):
-    return {'error': 'You must be an admin'}, 401
+    @app.errorhandler(401)
+    def unathorized(err):
+        return {'error': 'You must be an admin'}, 401
 
 #----- MOVING BELOW THIS LINE TO USER
 # creating a model for the users entity
@@ -168,9 +170,11 @@ def unathorized(err):
 #     print('Models seeded')
 # ------ MOVING ABOVE THIS LINE TO cli_bp.py
 
-app.register_blueprint(cli_bp)
-app.register_blueprint(auth_bp)
-app.register_blueprint(cards_bp)
+    app.register_blueprint(cli_bp)
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(cards_bp)
+
+    return app
 
 # # ------ MOVING BELOW THIS LINE TO auth_bp.py
 # @app.route('/register', methods=['POST'])
@@ -256,13 +260,16 @@ app.register_blueprint(cards_bp)
 #         print(card.__dict__)
 #----- MOVING ABOVE THIS LINE to cards_bp.py
 
-@app.route('/')
-@app.route('/home')
-@app.route('/home/')
-@app.route('/index')
-@app.route('/index/')
-def index():
-    return 'Lali ho, friend!'
 
-if __name__ == '__main__':
-    app.run(debug=True) #this line runs the instance of Flask
+# # this home route doesn't serve a resource in the API, so we don't need it anymore
+# @app.route('/')
+# @app.route('/home')
+# @app.route('/home/')
+# @app.route('/index')
+# @app.route('/index/')
+# def index():
+#     return 'Lali ho, friend!'
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True) #this line runs the instance of Flask
