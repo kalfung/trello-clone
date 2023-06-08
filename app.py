@@ -12,6 +12,7 @@ from models.user import User, UserSchema
 from models.card import Card, CardSchema
 from init import db, ma, bcrypt, jwt
 from blueprints.cli_bp import db_commands
+from blueprints.auth_bp import auth_bp
 
 load_dotenv()
 
@@ -165,44 +166,47 @@ def unathorized(err):
 # ------ MOVING ABOVE THIS LINE TO cli_bp.py
 
 app.register_blueprint(db_commands)
+app.register_blueprint(auth_bp)
 
-@app.route('/register', methods=['POST'])
-@app.route('/register/', methods=['POST'])
-def register():
-    try:
-        #Parse, sanitise and validate the incoming JSON data via the schema
-        user_info = UserSchema().load(request.json)
-        # create a new user model instance with the schema data
-        user = User(
-            email=user_info['email'], 
-            password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
-            name=user_info['name']
-        )
+# # ------ MOVING BELOW THIS LINE TO auth_bp.py
+# @app.route('/register', methods=['POST'])
+# @app.route('/register/', methods=['POST'])
+# def register():
+#     try:
+#         #Parse, sanitise and validate the incoming JSON data via the schema
+#         user_info = UserSchema().load(request.json)
+#         # create a new user model instance with the schema data
+#         user = User(
+#             email=user_info['email'], 
+#             password=bcrypt.generate_password_hash(user_info['password']).decode('utf-8'),
+#             name=user_info['name']
+#         )
 
-        #Add and commit the new user
-        db.session.add(user)
-        db.session.commit()
+#         #Add and commit the new user
+#         db.session.add(user)
+#         db.session.commit()
         
-        return UserSchema(exclude=['password']).dump(user), 201
-    except IntegrityError:
-        return {'error': 'Email address already in use'}, 409
-        # print(user)
-        # # print(request.json)
-        # return{}
+#         return UserSchema(exclude=['password']).dump(user), 201
+#     except IntegrityError:
+#         return {'error': 'Email address already in use'}, 409
+#         # print(user)
+#         # # print(request.json)
+#         # return{}
 
-@app.route('/login', methods=['POST'])
-@app.route('/login/', methods=['POST'])
-def login():
-    try:
-        stmt = db.select(User).filter_by(email=request.json['email'])
-        user = db.session.scalar(stmt) #returns a single result, not in a list
-        if user and bcrypt.check_password_hash(user.password, request.json['password']):
-            token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))
-            return {'token':token, 'user': UserSchema(exclude=['password']).dump(user)}
-        else:
-            return {'error': 'Invalid email address or password'}, 401
-    except KeyError:
-        return {'error': 'Email address and password are required'}, 400
+# @app.route('/login', methods=['POST'])
+# @app.route('/login/', methods=['POST'])
+# def login():
+#     try:
+#         stmt = db.select(User).filter_by(email=request.json['email'])
+#         user = db.session.scalar(stmt) #returns a single result, not in a list
+#         if user and bcrypt.check_password_hash(user.password, request.json['password']):
+#             token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))
+#             return {'token':token, 'user': UserSchema(exclude=['password']).dump(user)}
+#         else:
+#             return {'error': 'Invalid email address or password'}, 401
+#     except KeyError:
+#         return {'error': 'Email address and password are required'}, 400
+# # ------ MOVING ABOVE THIS LINE TO auth_bp.py
 
 @app.route('/cards/')
 @app.route('/cards')
