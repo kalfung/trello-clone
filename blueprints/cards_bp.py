@@ -23,3 +23,9 @@ def all_cards():
         print(flub.title)
     # return json.dumps(cards) #this line doesn't work
     return CardSchema(many=True, exclude=['date_created']).dump(cards) #returning the Marshmallow schema
+
+@cards_bp.route('/cards/<int:card_id>')
+def one_card(card_id):
+    stmt = db.select(Card).filter_by(id=card_id)
+    card = db.session.scalar(stmt)
+    return CardSchema().dump(card)
