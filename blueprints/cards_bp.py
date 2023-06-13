@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request
 from models.card import Card, CardSchema
 from init import db
 from flask_jwt_extended import jwt_required
@@ -34,3 +34,10 @@ def one_card(card_id):
         return CardSchema().dump(card)
     else:
         return {'error': 'Card not found'}, 404
+    
+#Create a new card
+@cards_bp.route('/', methods=['POST'])
+def create_card():
+    card_info = CardSchema().load(request.json)
+    print(card_info)
+    return{}
