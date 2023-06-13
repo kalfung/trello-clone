@@ -3,6 +3,7 @@ from models.card import Card, CardSchema
 from init import db
 from flask_jwt_extended import jwt_required
 from blueprints.auth_bp import admin_required
+from datetime import date
 
 cards_bp = Blueprint('cards', __name__, url_prefix='/cards')
 
@@ -38,6 +39,17 @@ def one_card(card_id):
 #Create a new card
 @cards_bp.route('/', methods=['POST'])
 def create_card():
+    # Load the incoming POST data via the schema
     card_info = CardSchema().load(request.json)
-    print(card_info)
-    return{}
+    # Create a new Card instance from the card_info
+    card = Card(
+        title = card_info['title'],
+        description = card_info['description'],
+        status = card_info['status'],
+        date_created = date.today()
+    )
+    # Add and commit the new card to the session
+    db.session.add(card)
+    db.session.commit()
+    # Send the new card back to the client
+    return CardSchema().dump(card), 201
