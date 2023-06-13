@@ -28,4 +28,7 @@ def all_cards():
 def one_card(card_id):
     stmt = db.select(Card).filter_by(id=card_id)
     card = db.session.scalar(stmt)
-    return CardSchema().dump(card)
+    if card:
+        return CardSchema().dump(card)
+    else:
+        return {'error': 'Card not found'}, 404
