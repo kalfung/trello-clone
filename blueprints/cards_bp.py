@@ -69,3 +69,17 @@ def update_card(card_id):
         return CardSchema().dump(card)
     else:
         return {'error': 'Card not found'}, 404
+    
+# Delete a card
+@cards_bp.route('/<int:card_id>', methods=['DELETE'])
+@jwt_required()
+def delete_card(card_id):
+  admin_required()
+  stmt = db.select(Card).filter_by(id=card_id)
+  card = db.session.scalar(stmt)
+  if card:
+    db.session.delete(card)
+    db.session.commit()
+    return {}, 200
+  else:
+    return {'error': 'Card not found'}, 404
